@@ -13,7 +13,7 @@ use std::{
     time::Duration,
 };
 
-use log::{debug, info};
+use log::{debug, info, trace};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serialport::{SerialPort, UsbPortInfo};
@@ -24,13 +24,8 @@ use self::reset::UnixTightReset;
 use self::{
     encoder::SlipEncoder,
     reset::{
-        ClassicReset,
-        ResetStrategy,
-        UsbJtagSerialReset,
-        construct_reset_strategy_sequence,
-        hard_reset,
-        reset_after_flash,
-        soft_reset,
+        ClassicReset, ResetStrategy, UsbJtagSerialReset, construct_reset_strategy_sequence,
+        hard_reset, reset_after_flash, soft_reset,
     },
 };
 use crate::{
@@ -332,6 +327,7 @@ impl Connection {
                 download_mode = data.get(2).is_some();
 
                 // Further processing or printing the results
+                debug!("Line: {read_slice}");
                 debug!("Boot Mode: {boot_mode}");
                 debug!("Download Mode: {download_mode}");
             };
@@ -629,7 +625,7 @@ impl Connection {
 
     /// Writes a command to the serial port.
     pub fn write_command(&mut self, command: Command<'_>) -> Result<(), Error> {
-        debug!("Writing command: {command:02x?}");
+        trace!("Writing command: {command:02x?}");
         let mut binding = Box::new(&mut self.serial);
         let serial = binding.as_mut();
 
